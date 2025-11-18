@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">GitHubFetcher</string>
+    
+    <string name="input_username_placeholder">Input full GitHub username.</string>
+    <string name="use_search_tool">Use search tool to find repositories.</string>
+    <string name="could_not_fetch_repos">Could not fetch repositories.</string>
+    <string name="no_repos">No repositories found.</string>
+</resources>
