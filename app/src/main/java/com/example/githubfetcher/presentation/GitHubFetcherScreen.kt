@@ -25,14 +25,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.githubfetcher.R
-import com.example.githubfetcher.data.Repository
+import com.example.githubfetcher.presentation.model.RepositoryUiModel
 
 @Composable
 fun GitHubFetcherScreen(
@@ -94,7 +93,7 @@ private fun GitHubFetcherScreenContent(
 
 @Composable
 private fun ReposColumn(
-    repos: List<Repository>,
+    repos: List<RepositoryUiModel>,
     cached: Boolean
 ) {
     Column(
@@ -124,7 +123,7 @@ private fun ReposColumn(
 
 
 @Composable
-private fun RepoItem(repository: Repository) {
+private fun RepoItem(repository: RepositoryUiModel) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth()
     ) {

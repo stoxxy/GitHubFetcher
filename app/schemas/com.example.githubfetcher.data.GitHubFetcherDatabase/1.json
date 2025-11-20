@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "71006b50c490cdf0caae3d359ee42286",
+    "identityHash": "e6df228287d32ea4281e4214f05163cb",
     "entities": [
       {
-        "tableName": "Repository",
+        "tableName": "repository",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `description` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -36,7 +36,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '71006b50c490cdf0caae3d359ee42286')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e6df228287d32ea4281e4214f05163cb')"
     ]
   }
 }

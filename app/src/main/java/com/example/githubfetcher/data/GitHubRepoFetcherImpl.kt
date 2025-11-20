@@ -3,7 +3,9 @@ package com.example.githubfetcher.data
 import GitHubFetcher.app.BuildConfig
 import android.net.http.HttpEngine
 import android.util.Log
+import com.example.githubfetcher.data.model.RepositoryEntity
 import com.example.githubfetcher.domain.GitHubRepoFetcher
+import com.example.githubfetcher.domain.model.Repository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -35,7 +37,7 @@ class GitHubRepoFetcherImpl(
         }
         defaultRequest { url("https://api.github.com/") }
     }
-    override suspend fun fetchRepos(username: String): List<Repository> {
+    override suspend fun fetchRepos(username: String): List<RepositoryEntity> {
         return client.get("users/$username/repos") {
            headers {
                append(HttpHeaders.Authorization, "Bearer ${BuildConfig.GITHUB_ACCESS_TOKEN}")

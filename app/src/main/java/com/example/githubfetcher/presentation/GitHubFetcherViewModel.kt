@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.githubfetcher.domain.GitHubFetcherRepository
+import com.example.githubfetcher.presentation.model.toUi
 import com.example.githubfetcher.util.RemoteGitHubFetchException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -60,14 +61,14 @@ class GitHubFetcherViewModel @Inject constructor(
     private fun search(username: String) = flow {
         emit(GitHubFetchResult.InProgress)
         try {
-            val repos = repository.fetchRepos(username)
+            val repos = repository.fetchRepos(username).toUi()
             emit(GitHubFetchResult.Success(repos))
         } catch (e: Exception) {
             if (e.message?.contains("Not Found") == true) emit(GitHubFetchResult.Success(listOf())).also { return@flow }
             if (e is RemoteGitHubFetchException) {
                 // If fetching and saving fails, try to fetch recent repositories from local database.
                 try {
-                    val cachedRepos = repository.fetchRecentFromTheDatabase()
+                    val cachedRepos = repository.fetchRecentFromTheDatabase().toUi()
                     emit(if (cachedRepos.isNotEmpty()) GitHubFetchResult.Success(cachedRepos, true)
                     else GitHubFetchResult.Error)
                 } catch (e: Exception) {
