@@ -14,6 +14,7 @@ buildConfig = "5.7.1"
 daggerHilt = "2.57.1"
 ksp = "2.0.21-1.0.27"
 slf4j = "2.0.17-0"
+room = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,11 @@ kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 slf4j-android = { module = "uk.uuid.slf4j:slf4j-android", version.ref = "slf4j" }
 
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -52,3 +58,4 @@ dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt
 build-config = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
+room = { id = "androidx.room", version.ref = "room" }

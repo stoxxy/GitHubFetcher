@@ -1,5 +1,8 @@
 package com.example.githubfetcher.di
 
+import android.content.Context
+import androidx.room.Room
+import com.example.githubfetcher.data.GitHubFetcherDatabase
 import com.example.githubfetcher.data.GitHubFetcherRepositoryImpl
 import com.example.githubfetcher.data.GitHubRepoFetcherImpl
 import com.example.githubfetcher.domain.GitHubFetcherRepository
@@ -8,6 +11,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.engine.cio.CIO
 
@@ -28,8 +32,19 @@ abstract class GitHubFetcherDataModule {
         @Provides
         fun provideGitHubRepoFetcher() = GitHubRepoFetcherImpl(engine = CIO.create())
         @Provides
+        fun provideGitHubFetcherDatabase(@ApplicationContext context: Context): GitHubFetcherDatabase =
+            Room.databaseBuilder(
+                context,
+                GitHubFetcherDatabase::class.java,
+                "github-fetcher-database"
+            ).build()
+        @Provides
         fun provideGitHubFetcherRepository(
-            gitHubRepoFetcher: GitHubRepoFetcher
-        ) = GitHubFetcherRepositoryImpl(gitHubRepoFetcher = gitHubRepoFetcher)
+            gitHubRepoFetcher: GitHubRepoFetcher,
+            gitHubFetcherDatabase: GitHubFetcherDatabase
+        ) = GitHubFetcherRepositoryImpl(
+            gitHubRepoFetcher = gitHubRepoFetcher,
+            gitHubFetcherDatabase = gitHubFetcherDatabase
+        )
     }
 }

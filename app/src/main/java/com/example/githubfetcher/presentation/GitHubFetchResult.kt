@@ -8,6 +8,6 @@ sealed class GitHubFetchResult: Parcelable {
     @Parcelize
     data object None: GitHubFetchResult()
     @Parcelize data object InProgress: GitHubFetchResult()
-    @Parcelize data class Success(val repos: List<Repository>): GitHubFetchResult()
-    @Parcelize data class Error(val message: String): GitHubFetchResult()
+    @Parcelize data class Success(val repos: List<Repository>, val cached: Boolean = false): GitHubFetchResult()
+    @Parcelize data object Error: GitHubFetchResult()
 }

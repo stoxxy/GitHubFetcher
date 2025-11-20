@@ -1,18 +1,16 @@
 package com.example.githubfetcher.presentation
 
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.githubfetcher.data.Repository
 import com.example.githubfetcher.domain.GitHubFetcherRepository
+import com.example.githubfetcher.util.RemoteGitHubFetchException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -22,9 +20,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
@@ -68,13 +63,27 @@ class GitHubFetcherViewModel @Inject constructor(
             val repos = repository.fetchRepos(username)
             emit(GitHubFetchResult.Success(repos))
         } catch (e: Exception) {
-            emit(if (e.message?.contains("Not Found") == true) GitHubFetchResult.Success(listOf())
-                    else GitHubFetchResult.Error(e.message ?: e.toString()))
+            if (e.message?.contains("Not Found") == true) emit(GitHubFetchResult.Success(listOf())).also { return@flow }
+            if (e is RemoteGitHubFetchException) {
+                // If fetching and saving fails, try to fetch recent repositories from local database.
+                try {
+                    val cachedRepos = repository.fetchRecentFromTheDatabase()
+                    emit(if (cachedRepos.isNotEmpty()) GitHubFetchResult.Success(cachedRepos, true)
+                    else GitHubFetchResult.Error)
+                } catch (e: Exception) {
+                    Log.d(CLASS_NAME, "Fallback error: ${e.message ?: e.toString()}")
+                    emit(GitHubFetchResult.Error)
+                }
+            } else {
+                Log.d(CLASS_NAME, "Unknown error: ${e.message ?: e.toString()}")
+                emit(GitHubFetchResult.Error)
+            }
         }
     }
 
     private companion object {
         const val UI_STATE_KEY = "ui_state"
+        const val CLASS_NAME = "GitHubFetcherViewModel"
     }
 }
 
