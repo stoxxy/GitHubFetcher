@@ -2,6 +2,7 @@ package com.example.githubfetcher.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.githubfetcher.data.GitHubFetcherDataSource
 import com.example.githubfetcher.data.GitHubFetcherDatabase
 import com.example.githubfetcher.data.GitHubFetcherRepositoryImpl
 import com.example.githubfetcher.data.GitHubRepoFetcherImpl
@@ -38,13 +39,18 @@ abstract class GitHubFetcherDataModule {
                 GitHubFetcherDatabase::class.java,
                 "github-fetcher-database"
             ).build()
+
+        @Provides
+        fun provideGitHubFetcherDataSource(
+            gitHubFetcherDatabase: GitHubFetcherDatabase
+        ) = GitHubFetcherDataSource(gitHubFetcherDatabase)
         @Provides
         fun provideGitHubFetcherRepository(
             gitHubRepoFetcher: GitHubRepoFetcher,
-            gitHubFetcherDatabase: GitHubFetcherDatabase
+            gitHubFetcherDataSource: GitHubFetcherDataSource
         ) = GitHubFetcherRepositoryImpl(
             gitHubRepoFetcher = gitHubRepoFetcher,
-            gitHubFetcherDatabase = gitHubFetcherDatabase
+            gitHubFetcherDataSource = gitHubFetcherDataSource
         )
     }
 }

@@ -9,7 +9,7 @@ import com.example.githubfetcher.util.RemoteGitHubFetchException
 
 class GitHubFetcherRepositoryImpl(
     private val gitHubRepoFetcher: GitHubRepoFetcher,
-    private val gitHubFetcherDatabase: GitHubFetcherDatabase
+    private val gitHubFetcherDataSource: GitHubFetcherDataSource
 ): GitHubFetcherRepository {
     override suspend fun fetchRepos(username: String): List<Repository> {
         var reposEntities: List<RepositoryEntity>
@@ -18,9 +18,9 @@ class GitHubFetcherRepositoryImpl(
         } catch (_: Exception) {
             throw RemoteGitHubFetchException()
         }
-        gitHubFetcherDatabase.getDao().clearAndInsert(reposEntities)
+        gitHubFetcherDataSource.saveRepos(reposEntities)
         return reposEntities.toDomain()
     }
 
-    override suspend fun fetchRecentFromTheDatabase() = gitHubFetcherDatabase.getDao().getAll().toDomain()
+    override suspend fun fetchRecentFromTheDatabase() = gitHubFetcherDataSource.getRepos().toDomain()
 }

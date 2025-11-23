@@ -36,6 +36,12 @@ android {
         schemaDirectory("$projectDir/schemas")
     }
 
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -84,6 +90,11 @@ dependencies {
     implementation(libs.room.ktx)
 
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.test.ext)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.slf4j.simple)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
