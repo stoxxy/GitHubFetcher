@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -36,10 +37,10 @@ class GitHubFetcherViewModel @Inject constructor(
     init {
         uiState.map { it.username }
             .distinctUntilChanged()
-            .debounce(600L)
+            .debounce(SEARCH_DELAY)
             .filter { it.isNotBlank() }
             .flatMapLatest { search(it) }
-            .onEach { result -> updateState { it.copy(fetchResult = result) } }
+            .onEach { result -> updateState { it.copy(reposFetchResult = result) } }
             .flowOn(dispatcher)
             .launchIn(viewModelScope)
 
@@ -49,6 +50,13 @@ class GitHubFetcherViewModel @Inject constructor(
         when (intent) {
             is GitHubFetcherIntent.SearchInput -> {
                 updateState { it.copy(username = intent.username) }
+            }
+            is GitHubFetcherIntent.SelectRepo -> {
+                updateState { it.copy(selectedRepoName = intent.repoName) }
+                fetchCommits()
+            }
+            is GitHubFetcherIntent.CloseCommitsScreen -> {
+                updateState { it.copy(selectedRepoName = "", commitFetchResult = GitHubFetchResult.None) }
             }
         }
     }
@@ -64,9 +72,9 @@ class GitHubFetcherViewModel @Inject constructor(
             val repos = repository.fetchRepos(username).toUi()
             emit(GitHubFetchResult.Success(repos))
         } catch (e: Exception) {
-            if (e.message?.contains("Not Found") == true) emit(GitHubFetchResult.Success(listOf())).also { return@flow }
+            if (e.message?.contains("Not Found") == true) emit(GitHubFetchResult.NoContent).also { return@flow }
             if (e is RemoteGitHubFetchException) {
-                // If fetching and saving fails, try to fetch recent repositories from local database.
+                // If remote fetching fails, try to fetch recent repositories from local database.
                 try {
                     val cachedRepos = repository.fetchRecentFromTheDatabase().toUi()
                     emit(if (cachedRepos.isNotEmpty()) GitHubFetchResult.Success(cachedRepos, true)
@@ -82,7 +90,20 @@ class GitHubFetcherViewModel @Inject constructor(
         }
     }
 
+    private fun fetchCommits() = flow {
+        emit(GitHubFetchResult.InProgress)
+        try {
+            val commits = repository.fetchCommits(uiState.value.username, uiState.value.selectedRepoName)
+            emit(GitHubFetchResult.Success(commits.toUi()))
+        } catch (e: Exception) {
+            if (e.message?.contains("Git Repository is empty.") == true) emit(GitHubFetchResult.NoContent).also { return@flow }
+            emit(GitHubFetchResult.Error)
+        }
+    }.onEach { result -> updateState { it.copy(commitFetchResult = result) } }
+        .launchIn(viewModelScope)
+
     private companion object {
+        const val SEARCH_DELAY = 600L
         const val UI_STATE_KEY = "ui_state"
         const val CLASS_NAME = "GitHubFetcherViewModel"
     }
@@ -91,5 +112,7 @@ class GitHubFetcherViewModel @Inject constructor(
 @Parcelize
 data class UiState(
     val username: String = "",
-    val fetchResult: GitHubFetchResult = GitHubFetchResult.None
+    val selectedRepoName: String = "",
+    val reposFetchResult: GitHubFetchResult = GitHubFetchResult.None,
+    val commitFetchResult: GitHubFetchResult = GitHubFetchResult.None
 ): Parcelable

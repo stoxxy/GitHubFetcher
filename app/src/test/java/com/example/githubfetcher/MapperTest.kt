@@ -2,6 +2,9 @@ package com.example.githubfetcher
 
 import com.example.githubfetcher.data.model.RepositoryEntity
 import com.example.githubfetcher.data.model.toDomain
+import com.example.githubfetcher.domain.model.Commit
+import com.example.githubfetcher.domain.model.CommitAuthor
+import com.example.githubfetcher.domain.model.CommitContent
 import com.example.githubfetcher.domain.model.Repository
 import com.example.githubfetcher.presentation.model.toUi
 import junit.framework.TestCase.assertEquals
@@ -10,17 +13,17 @@ import org.junit.Test
 class MapperTest {
 
     @Test
-    fun entityToDomain_fieldsAreCorrect() {
-        val domain = entity.toDomain()
+    fun repositoryEntityToDomain_fieldsAreCorrect() {
+        val domain = entityRepository.toDomain()
 
-        assertEquals(ID, domain.id)
-        assertEquals(NAME, domain.name)
-        assertEquals(DESCRIPTION, domain.description)
+        assertEquals(REPOSITORY_ID, domain.id)
+        assertEquals(REPOSITORY_NAME, domain.name)
+        assertEquals(REPOSITORY_DESCRIPTION, domain.description)
     }
 
     @Test
-    fun entityListToDomain_fieldsAreCorrect() {
-        val entities = List(10) { entity.copy(id = it.toLong()) }
+    fun repositoryEntityListToDomain_fieldsAreCorrect() {
+        val entities = List(10) { entityRepository.copy(id = it.toLong()) }
         val domains = entities.toDomain()
 
         for (i in entities.indices) {
@@ -31,17 +34,17 @@ class MapperTest {
     }
 
     @Test
-    fun domainToUi_fieldsAreCorrect() {
-        val ui = domain.toUi()
+    fun repositoryDomainToUi_fieldsAreCorrect() {
+        val ui = domainRepository.toUi()
 
-        assertEquals(ui.id, domain.id)
-        assertEquals(ui.name, domain.name)
-        assertEquals(ui.description, domain.description)
+        assertEquals(ui.id, domainRepository.id)
+        assertEquals(ui.name, domainRepository.name)
+        assertEquals(ui.description, domainRepository.description)
     }
 
     @Test
-    fun domainListToUi_fieldsAreCorrect() {
-        val domains = List(10) { domain.copy(id = it.toLong()) }
+    fun repositoryDomainListToUi_fieldsAreCorrect() {
+        val domains = List(10) { domainRepository.copy(id = it.toLong()) }
         val uis = domains.toUi()
 
         for (i in domains.indices) {
@@ -51,20 +54,39 @@ class MapperTest {
         }
     }
 
-    private companion object {
-        const val ID = 0L
-        const val NAME = "testName"
-        const val DESCRIPTION = "testDescription"
+    @Test
+    fun commitDomainToUi_fieldsAreCorrect() {
+        val ui = domainCommit.toUi().commit
 
-        val entity = RepositoryEntity(
-            id = ID,
-            name = NAME,
-            description = DESCRIPTION
+        assertEquals(ui.author.name, COMMIT_AUTHOR)
+        assertEquals(ui.message, COMMIT_MESSAGE)
+        assertEquals(ui.url, COMMIT_URL)
+    }
+
+    private companion object {
+        const val REPOSITORY_ID = 0L
+        const val REPOSITORY_NAME = "testName"
+        const val REPOSITORY_DESCRIPTION = "testDescription"
+        const val COMMIT_URL = "commitUrl"
+        const val COMMIT_AUTHOR = "commitAuthor"
+        const val COMMIT_MESSAGE = "commitMessage"
+
+        val entityRepository = RepositoryEntity(
+            id = REPOSITORY_ID,
+            name = REPOSITORY_NAME,
+            description = REPOSITORY_DESCRIPTION
         )
-        val domain = Repository(
-            id = ID,
-            name = NAME,
-            description = DESCRIPTION
+        val domainRepository = Repository(
+            id = REPOSITORY_ID,
+            name = REPOSITORY_NAME,
+            description = REPOSITORY_DESCRIPTION
+        )
+        val domainCommit = Commit(
+            commit = CommitContent(
+                url = COMMIT_URL,
+                author = CommitAuthor(name = COMMIT_AUTHOR),
+                message = COMMIT_MESSAGE
+            )
         )
     }
 }

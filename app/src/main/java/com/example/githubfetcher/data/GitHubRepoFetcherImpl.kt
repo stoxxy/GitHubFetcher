@@ -1,16 +1,12 @@
 package com.example.githubfetcher.data
 
 import GitHubFetcher.app.BuildConfig
-import android.net.http.HttpEngine
-import android.util.Log
 import com.example.githubfetcher.data.model.RepositoryEntity
 import com.example.githubfetcher.domain.GitHubRepoFetcher
-import com.example.githubfetcher.domain.model.Repository
+import com.example.githubfetcher.domain.model.Commit
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.plugins.DataConversion.install
-import io.ktor.client.plugins.api.SetupRequest.install
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.DEFAULT
@@ -19,7 +15,6 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
-import io.ktor.client.request.request
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -43,5 +38,16 @@ class GitHubRepoFetcherImpl(
                append(HttpHeaders.Authorization, "Bearer ${BuildConfig.GITHUB_ACCESS_TOKEN}")
            }
        }.body()
+    }
+
+    override suspend fun fetchCommits(
+        username: String,
+        repo: String
+    ): List<Commit> {
+        return client.get("repos/$username/$repo/commits") {
+            headers {
+                append(HttpHeaders.Authorization, "Bearer ${BuildConfig.GITHUB_ACCESS_TOKEN}")
+            }
+        }.body()
     }
 }

@@ -1,3 +1,3 @@
 package com.example.githubfetcher.util
 
-class RemoteGitHubFetchException: Exception()
+class RemoteGitHubFetchException(message: String): Exception(message)
