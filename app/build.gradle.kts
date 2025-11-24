@@ -38,6 +38,10 @@ android {
 
     testOptions {
         unitTests {
+            all {
+                it.jvmArgs("-Xverify:none")
+            }
+
             isIncludeAndroidResources = true
         }
     }

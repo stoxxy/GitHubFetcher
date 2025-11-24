@@ -68,7 +68,7 @@ class GitHubFetcherRepositoryTest {
     fun commitsFetch_error_exceptionThrown() {
         coEvery { gitHubRepoFetcher.fetchCommits(USERNAME, REPO_NAME) } throws RemoteGitHubFetchException(EXCEPTION_MESSAGE)
 
-        assertThrows(IOException::class.java) {
+        assertThrows(RemoteGitHubFetchException::class.java) {
             runBlocking { repository.fetchCommits(USERNAME, REPO_NAME) }
         }
     }
