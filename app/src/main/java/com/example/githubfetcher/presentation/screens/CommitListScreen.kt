@@ -41,7 +41,7 @@ fun CommitListScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dpx)
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)
         ) {
             IconButton(onClick = onBack,
                 modifier = Modifier.weight(0.2f)) { Icons.AutoMirrored.Filled.ArrowBack.let { Icon(it, it.name) } }
